@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+    apache:
+        build:
+            context: ./srcs
+        container_name: 'Apache'
+        depends_on:
+            - database
+        volumes:
+            - ./srcs:/var/www/html
+        ports:
+            - 8080:80
+
+    database:
+        image: mysql
+        container_name: database
+        environment:
+            MYSQL_ROOT_PASSWORD: pass
+            MYSQL_DATABASE: docker_database
+        volumes:
+            - ./db_data:/var/lib/mysql
+            # - ./config/mysql.conf:/etc/mysql/conf.d
+
+    phpmyadmin:
+        container_name: phpmyadmin
+        image: phpmyadmin/phpmyadmin
+        environment:
+            PMA_HOST: apache
+            PMA_USER: root
+            PMA_PASSWORD: pass
+        
