@@ -1,3 +1,3 @@
 <div>
-	<p>Salut <?= $this->parameters['post_id'] ?></p>
+	<p>Salut toi</p>
 </div>

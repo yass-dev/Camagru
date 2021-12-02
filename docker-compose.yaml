@@ -17,16 +17,17 @@ services:
         container_name: database
         environment:
             MYSQL_ROOT_PASSWORD: pass
-            MYSQL_DATABASE: docker_database
+            MYSQL_DATABASE: camagru
         volumes:
             - ./db_data:/var/lib/mysql
-            # - ./config/mysql.conf:/etc/mysql/conf.d
 
     phpmyadmin:
         container_name: phpmyadmin
         image: phpmyadmin/phpmyadmin
         environment:
-            PMA_HOST: apache
+            PMA_HOST: database
             PMA_USER: root
             PMA_PASSWORD: pass
+        ports:
+            - 8000:80
         

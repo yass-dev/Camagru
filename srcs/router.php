@@ -1,14 +1,33 @@
 <?php
 
-require('router/router.class.php');
-require('controllers/test.controller.php');
+require_once('orm/orm.php');
+require_once('models/user.entity.php');
 
-$router = new Router();
-$router->addRoute("/users/:id/posts/:post_id", new TestController);
+require_once('router/router.class.php');
+require_once('controllers/test.controller.php');
 
-$url = $_SERVER['REQUEST_URI'];
 
-$route = $router->findRoute($url);
-$route->render();
+function initORM()
+{
+	$orm = new ORM();
+	$orm->connect('database', 'camagru', 'root', 'pass');
+	$orm->registerEntity(new User);
+	$orm->init();
+}
+
+function initRouter()
+{	
+	$router = new Router();
+	$router->addRoute("/", new TestController);
+	
+	$url = $_SERVER['REQUEST_URI'];
+	
+	$route = $router->findRoute($url);
+	$route->render();
+}
+
+initORM();
+initRouter();
+
 
 ?>
