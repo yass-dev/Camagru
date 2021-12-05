@@ -6,4 +6,4 @@ RewriteRule ^/?$ public/ [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-F
-RewriteRule ^(.+)$ router.php [L,QSA]
+RewriteRule ^(.+)$ index.php [L,QSA]

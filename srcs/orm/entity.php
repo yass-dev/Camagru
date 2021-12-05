@@ -34,6 +34,11 @@ abstract class Entity
 		$column = new Column($name, $type, $nullable);
 		array_push($this->columns, $column);
 	}
+
+	public function getName()
+	{
+		return $this->name;
+	}
 }
 
 ?>

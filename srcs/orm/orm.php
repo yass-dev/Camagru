@@ -6,7 +6,6 @@ class ORM
 {
 	private $db;
 	private $entites;
-	private $db_exists;
 
 	public function __construct()
 	{
@@ -20,14 +19,10 @@ class ORM
 
 	public function init()
 	{
-		// Init tables
-		if ($this->db_exists == false)
+		foreach ($this->entites as $entity)
 		{
-			foreach ($this->entites as $entity)
-			{
-				$query = $entity->generateQuery();
-				$this->db->exec($query);
-			}
+			$query = $entity->generateQuery();
+			$this->db->exec($query);
 		}
 	}
 
@@ -36,9 +31,6 @@ class ORM
 		try
 		{
 			$this->db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", "$username", "$password");
-			$query = $this->db->query("SHOW DATABASES LIKE '$dbname';");
-			$this->db_exists = $query->fetch() != false;
-			$query->closeCursor();
 		}
 		catch (Exception $e)
 		{

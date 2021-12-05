@@ -1,22 +1,20 @@
 <?php
 
-require_once('controllers/abstract-controller.class.php');
 
 class Route
 {
 	private $path = "";
-	private $controller = null;
+	private $controller_func;
 	private $parameters = array();
 
 	/**
 	 * @param string $path
-	 * @param \AbstractController $controller
 	 * @var \Route $new_route
 	 */
-	public function __construct($path, $controller)
+	public function __construct($path, $controller_func)
 	{
 		$this->path = $path;
-		$this->controller = $controller;
+		$this->controller_func = $controller_func;
 	
 		$path_parts = explode('/', $this->path);
 		foreach ($path_parts as $part)
@@ -45,9 +43,9 @@ class Route
 		$this->parameters[$name] = $value;
 	}
 
-	public function render()
+	public function execute()
 	{
-		$this->controller->render($this->parameters);
+		($this->controller_func)($this->parameters);
 	}
 }
 

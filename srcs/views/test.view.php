@@ -1,3 +1,3 @@
 <div>
-	<p>Salut toi</p>
+	<p>Salut toi <?= $parameters['id'] ?></p>
 </div>

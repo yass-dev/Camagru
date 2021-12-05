@@ -12,13 +12,11 @@ class Router
 	}
 
 	/**
-	 * @param string $path 
-	 * @param \AbstractController $controller
-	 * @var \Route $new_route
+	 * 
 	 */
-	public function addRoute($path, $controller)
+	public function addRoute($path, callable $func)
 	{
-		$new_route = new Route($path, $controller);
+		$new_route = new Route($path, $func);
 		array_push($this->routes, $new_route);
 	}
 
@@ -27,7 +25,7 @@ class Router
 	 * @var \Route $route
 	 * @return \Route
 	 */
-	public function findRoute($url)
+	private function findRoute($url)
 	{
 		$url_parts = explode('/', $url);
 		foreach ($this->routes as $route)
@@ -66,6 +64,18 @@ class Router
 				return $route;
 		}
 		return null;
+	}
+
+	public function execute()
+	{
+		$url = $_SERVER['REQUEST_URI'];
+		$route = $this->findRoute($url);
+		if ($route != null)
+			$route->execute();
+		else	// 404
+		{
+			echo "404 route not found";
+		}
 	}
 }
 

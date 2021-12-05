@@ -1,17 +1,12 @@
 <?php
 
-require_once('controllers/abstract-controller.class.php');
+require_once('template-engine/template-engine.php');
 
-class TestController extends AbstractController
+class TestController
 {
-	public function __construct()
-	{
-		parent::__construct('views/test.view.php');
-	}
-
-	protected function execute()
-	{
-		$this->page_name = "test page name";
+	public static function testIndex($parameters = [])
+	{	
+		TemplateEngine::render(['views/test.view.php'], $parameters);
 	}
 }
 
