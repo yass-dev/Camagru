@@ -17,5 +17,6 @@
 			<?= $content ?>
 			<?php include('views/base/footer.view.php') ?>
 		</div>
+		<script src="/static/js/yass-framework.js"></script>
 	</body>
 </html>

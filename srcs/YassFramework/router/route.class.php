@@ -1,20 +1,21 @@
 <?php
 
-
 class Route
 {
-	private $path = "";
-	private $controller_func;
-	private $parameters = array();
+	public $path = "";
+	public $controller_func;
+	public $parameters = array();
+	public $method;
 
 	/**
 	 * @param string $path
 	 * @var \Route $new_route
 	 */
-	public function __construct($path, $controller_func)
+	public function __construct($path, $controller_func, $method)
 	{
 		$this->path = $path;
 		$this->controller_func = $controller_func;
+		$this->method = $method;
 	
 		$path_parts = explode('/', $this->path);
 		foreach ($path_parts as $part)
@@ -25,14 +26,6 @@ class Route
 				$this->parameters[$param_name] = "";
 			}
 		}
-	}
-
-	public function __get($name)
-	{
-		if (property_exists($this, $name))
-			return $this->$name;
-		else
-			throw new Exception("Error: property " . $name . " invalid !");
 	}
 
 	/**

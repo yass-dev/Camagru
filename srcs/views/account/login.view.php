@@ -1,6 +1,6 @@
 <div class="login">
 	<h1>Login</h1>
-	<form class="login_form">
+	<form id="login_form">
 		<div class="field">
 			<input type="text" id="username" autocomplete/>
 			<label for="username">Username</label>
@@ -10,7 +10,7 @@
 			<label for="password">Password</label>
 		</div>
 		<a href="/account/register">Not registered ? Sign up here</a>
-		<div class="button" id="login_button">Login</div>
+		<input type="submit" class="button" id="login_button" value="Login">
 	</form>
 </div>
 
@@ -28,9 +28,10 @@ for (let element of inputs)
 	})
 }
 
-let login_button = document.getElementById('login_button');
-login_button.addEventListener('click', function()
+let form = document.getElementById('login_form');
+form.addEventListener('submit', function(e)
 {
+	e.preventDefault();
 	let username = document.getElementById('username').value;
 	let password = document.getElementById('password').value;
 
@@ -103,6 +104,8 @@ input.active ~ label
 
 #login_button
 {
+	display: block;
+	background: white;
 	padding: 0.5rem 0.5rem;
     width: 10rem;
     margin: 0.5rem auto;

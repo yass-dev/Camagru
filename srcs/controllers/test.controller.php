@@ -1,6 +1,6 @@
 <?php
 
-require_once('template-engine/template-engine.php');
+require_once('YassFramework/template-engine/template-engine.php');
 
 class TestController
 {
