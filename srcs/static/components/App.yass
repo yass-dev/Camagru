@@ -1,0 +1,38 @@
+<script>
+
+registerComponent({
+	name: "App",
+	data()
+	{
+		return {
+
+		}
+	},
+	mounted()
+	{
+		console.log(`I am mounted !!!! (${this.name})`);
+	},
+	updated()
+	{
+		console.log(`I am updated !!!! (${this.name})`);
+	},
+	methods:
+	{
+
+	}
+})
+	
+</script>
+
+<template id="App">
+	<p>App</p>
+</template>
+
+<style id="AppTest">
+
+.test
+{
+	color: red;
+}
+
+</style>

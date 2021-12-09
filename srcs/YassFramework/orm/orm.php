@@ -8,10 +8,12 @@ class ORM
 {
 	private $db;
 	private $entites;
+	private $repositories;
 
 	public function __construct()
 	{
 		$this->entites = array();
+		$this->repositories = array();
 	}
 
 	public function registerEntity(Entity $entity)
@@ -64,12 +66,19 @@ class ORM
 		}
 	}
 
+	public function registerRepository($entity_class, $repository_class)
+	{
+		$this->repositories[$entity_class] = $repository_class;
+	}
+
 	/**
 	 * @param string $name
 	 * @return Repository
 	 */
 	public function getRepository(string $name)
 	{
+		if (array_key_exists($name, $this->repositories))
+			return new $this->repositories[$name]($this->db);
 		return new Repository($this->db, $name);
 	}
 

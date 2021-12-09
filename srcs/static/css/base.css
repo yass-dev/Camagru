@@ -1,6 +1,6 @@
 body
 {
-	width: 100vw;
+	width: 100%;
 	min-height: 100vh;
 	margin: 0;
 	overflow-y: auto;
@@ -8,35 +8,4 @@ body
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	color: #2c3e50;
-}
-
-a
-{
-	text-decoration: none;
-	color: inherit;
-}
-
-header
-{
-	padding: 0.5rem 1rem;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-header .brand
-{
-	font-size: 1.5rem;
-}
-
-header .links_container
-{
-	display: flex;
-}
-
-header .links_container a
-{
-	padding: 0.25rem 0.5rem;
-	margin: 0 1rem;
-	font-size: 1.25rem;
 }

@@ -6,8 +6,9 @@ class Publication extends Entity
 	public $user_id;
 	public $path;
 	public $date;
-	// public $likes;
-	// public $comments;
+	public $user;
+	public $likes;
+	public $comments;
 
 	public function __construct()
 	{
@@ -16,6 +17,14 @@ class Publication extends Entity
 		$this->addColumn('user_id', Column::NUMBER_TYPE, false);
 		$this->addColumn('date', Column::DATE_TYPE, false);
 		$this->addConstraint('user', 'user_id', 'user', 'id');
+	}
+
+	public function isLikedByUser()
+	{
+		foreach ($this->likes as $like)
+			if ($like->user_id == Session::get('user_id'))
+				return true;
+		return false;
 	}
 }
 

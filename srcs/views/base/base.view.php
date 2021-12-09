@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1.0">
 		<link rel="stylesheet" href="/static/css/base.css"/>
 		<script src="/static/js/ajax.js"></script>
+		<script src="/static/js/yass-framework-v2.js"></script>
 		<title>Camagru | <?= isset($page_name) ? $page_name : "" ?></title>
 	</head>
 	<body>
@@ -13,10 +14,15 @@
 			<strong>We're sorry but our app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
 		</noscript>
 		<div id="app">
-			<?php include('views/base/header.view.php') ?>
-			<?= $content ?>
-			<?php include('views/base/footer.view.php') ?>
+			<Header></Header>
+			<Gallerie></Gallerie>
 		</div>
-		<script src="/static/js/yass-framework.js"></script>
+		<YassComponent link="/static/components/App.yass"></YassComponent>
+		<YassComponent link="/static/components/Header.yass"></YassComponent>
+		<YassComponent link="/static/components/Gallerie.yass"></YassComponent>
+		<YassComponent link="/static/components/Publication.yass"></YassComponent>
+		<script>
+			const yass = new Yass('app');
+		</script>
 	</body>
 </html>

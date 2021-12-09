@@ -1,28 +1,30 @@
 class Ajax
 {
-	get(url, callback)
+	get(url)
 	{
-		const xmlhttp = new XMLHttpRequest();
-		xmlhttp.onload = callback;
-		xmlhttp.open("GET", url);
-		xmlhttp.send();
+		return fetch(url);
 	}
 
-	post(url, data, callback)
+	post(url, body)
 	{
-		const xmlhttp = new XMLHttpRequest();
-		xmlhttp.onload = callback;
-		xmlhttp.open("POST", url);
-		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-		let params = "";
-		for (let i = 0; i < Object.keys(data).length; i++)
+		let data = new FormData();
+		for (let i = 0; i < Object.keys(body).length; i++)
 		{
-			let key = Object.keys(data)[i];
-			params += `${key}=${data[key]}`;
-			if (i < Object.keys(data).length - 1)
-				params += '&';
+			let key = Object.keys(body)[i];
+			data.append(key, body[key])
 		}
-		xmlhttp.send(params);
+
+		return fetch(url, {
+			method: 'POST',
+			body: data
+		});
+	}
+
+	delete(url)
+	{
+		return fetch(url,
+		{
+			method: 'DELETE'
+		});
 	}
 }

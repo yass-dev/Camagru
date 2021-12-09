@@ -69,6 +69,7 @@ abstract class Entity
 
 	protected function addConstraint($name, $key_name, $entity, $entity_var)
 	{
+		$name = "fk_" . get_class($this) . "_$name";
 		$constraint = new ORMConstraint($name,$key_name, $entity, $entity_var);
 		array_push($this->constraints, $constraint);
 	}

@@ -1,0 +1,41 @@
+<script>
+
+registerComponent({
+	name: "Gallerie",
+	data()
+	{
+		return {
+			publications: []
+		}
+	},
+	mounted()
+	{
+		let ajax = new Ajax();
+		ajax.get('/publications')
+		.then(async res =>
+		{
+			this.publications = JSON.parse(await res.text());
+		});
+	}
+})
+
+</script>
+
+<template id="Gallerie">
+	<div class="gallerie" yass-if="this.publications.length > 0">
+		<p>{{ this.publications[0].user.username }} </p>
+		<Publication id="sss" :publication="this.publications[0]"></Publication>
+	</div>
+</template>
+
+<style>
+	
+.gallerie
+{
+	width: fit-content;
+	display: flex;
+	flex-direction: column;
+	margin: 0 auto;
+}
+
+</style>

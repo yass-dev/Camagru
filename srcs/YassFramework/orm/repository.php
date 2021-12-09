@@ -13,24 +13,25 @@ class Repository
 		$this->db = $db;
 	}
 
-	public function find($select = ['*'], $where = [], $relations = [], $order = [])
+	public function find($select = [], $where = [], $relations = [], $order = [])
 	{
 		$table_name = $this->entity->getTableName();
 		$params = [];
 
-		if ($select != '*')
+		if (count($select) == 0)
+			$select = $this->entity->getColumnNames();
+
+		// Always select id
+		array_push($select, 'id');
+		$select = array_map(function ($s) use($table_name)
 		{
-			// Always select id
-			array_push($select, 'id');
-			$select = array_map(function ($s) use($table_name)
-			{
-				// If the table are already defined in the select component, no need to append the table_name
-				if (str_contains($s, '.'))
-					return "$s AS `$s`";
-				else
-					return "$table_name.$s AS `$table_name.$s`";
-			}, $select);
-		}
+			// If the table are already defined in the select component, no need to append the table_name
+			if (str_contains($s, '.'))
+				return "$s AS `$s`";
+			else
+				return "$table_name.$s AS `$table_name.$s`";
+		}, $select);
+
 		$select_list = ($select == '*' ? '*' : implode(',', $select));
 
 		$query = " SELECT $select_list FROM $table_name ";
@@ -137,6 +138,14 @@ class Repository
 		}, $this->entity->getColumnNames());
 		
 		return $this->findOne($columns, ['id' => $id]);
+	}
+
+	public function delete(Entity $entity)
+	{
+		$table_name = $entity->getTableName();
+		$query = "DELETE FROM $table_name WHERE $table_name.id = :id";
+		$query = $this->db->prepare($query);
+		$query->execute(['id' => $entity->id]);
 	}
 }
 

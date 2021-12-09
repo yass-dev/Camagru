@@ -1,0 +1,67 @@
+<script>
+	registerComponent({
+	name: "Header",
+	data()
+	{
+		return {
+
+		}
+	},
+	mounted()
+	{
+		console.log(`I am mounted !!!! (${this.name})`);
+	},
+	
+	methods:
+	{
+		increment()
+		{
+			this.id++;
+		}
+	}
+});
+</script>
+
+<template id="Header">
+	<div class="header">
+		<a class="brand" href="/">Camagru</a>
+		<div class="links_container">
+			<a href="/">Gallery</a>
+			<a href="/builder">Builder</a>
+			<a href="/profile">Profile</a>
+		</div>
+	</div>
+</template>
+
+<style>
+	a
+	{
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.header
+	{
+		padding: 0.5rem 1rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.header .brand
+	{
+		font-size: 1.5rem;
+	}
+
+	.header .links_container
+	{
+		display: flex;
+	}
+
+	.header .links_container a
+	{
+		padding: 0.25rem 0.5rem;
+		margin: 0 1rem;
+		font-size: 1.25rem;
+	}
+</style>
