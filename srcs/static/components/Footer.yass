@@ -1,0 +1,26 @@
+<script>
+
+registerComponent({
+	name: "Footer",
+})
+
+</script>
+
+<template id="Footer">
+	<div class="footer">
+		<p>© Camagru 2021 - by Yass</p>
+	</div>
+</template>
+
+<style>
+
+.footer
+{
+	width: 100%;
+	padding: 4rem 1rem;
+	color: white;
+	background: rgb(53, 50, 50);
+	text-align: center;
+}
+
+</style>

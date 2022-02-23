@@ -1,0 +1,38 @@
+version: '3.3'
+
+services:
+    apache:
+        build:
+            context: ./srcs
+        container_name: 'Apache'
+        depends_on:
+            - database
+        volumes:
+            - ./srcs:/var/www/html
+        ports:
+            - 8080:80
+
+    database:
+        image: mysql
+        container_name: database
+        environment:
+            MYSQL_ROOT_PASSWORD: pass
+            MYSQL_DATABASE: camagru
+        volumes:
+            - ./db_data:/var/lib/mysql
+
+    phpmyadmin:
+        container_name: phpmyadmin
+        image: phpmyadmin/phpmyadmin
+        environment:
+            PMA_HOST: database
+            PMA_USER: root
+            PMA_PASSWORD: pass
+        ports:
+            - 8000:80
+
+    mailhog:
+        image: mailhog/mailhog
+        ports:
+            - "1025:1025"
+            - "8025:8025"

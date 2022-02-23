@@ -1,0 +1,48 @@
+<script>
+
+registerComponent({
+	name: "UserView",
+	data()
+	{
+		return {
+			publications: [],
+			username: "abc"
+		}
+	},
+	mounted()
+	{
+		console.log(this.$router.current_route.params.username, this.username);
+		this.username = this.$router.current_route.params.username;
+		let ajax = new Ajax();
+		ajax.get('/api/users/' + this.username + '/publications')
+		.then(res =>
+		{
+			this.publications = res.data;
+		})
+		.catch(err =>
+		{
+			alert(err);
+		})
+	}
+});
+
+</script>
+
+<template id="UserView">
+	<div class="user_view">
+		<h1>{{ this.username }}</h1>
+		<Publication yass-for="publication in this.publications" :publication="publication"></Publication>
+	</div>
+</template>
+
+<style>
+
+.user_view
+{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 0 auto;
+}
+
+</style>

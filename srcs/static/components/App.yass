@@ -1,0 +1,40 @@
+<script>
+
+registerComponent({
+	name: "App",
+	mounted()
+	{
+		let ajax = new Ajax();
+		ajax.get('/api/account/check_auth')
+		.then(res =>
+		{
+			this.$store.user.is_logged_in = true;
+			this.$store.user.id = res.data.id;
+			this.$store.user.username = res.data.username;
+			this.$store.user.email = res.data.email;
+		})
+		.catch(err =>
+		{
+
+		});
+	}
+})
+	
+</script>
+
+<template id="App">
+	<div class="app">
+		<Header></Header>
+		<yass-router-view></yass-router-view>
+		<Footer></Footer>
+	</div>
+</template>
+
+<style id="AppTest">
+
+.test
+{
+	color: red;
+}
+
+</style>

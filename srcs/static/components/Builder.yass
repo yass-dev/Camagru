@@ -1,0 +1,441 @@
+<script>
+
+registerComponent({
+	name: "Builder",
+	data()
+	{
+		return {
+			moved_sticker: -1,
+			selected_stickers: [],
+			image_selected: false,
+			mode: "build",
+			stickers:
+			[
+				"/static/img/babar.png",
+				"/static/img/tree.png",
+				"/static/img/noel.png",
+				"/static/img/sun.png",
+				"/static/img/costume.png",
+				"/static/img/among-us.gif"
+			],
+			publications: [],
+			is_moving: false,
+			initial_x: 0,
+			initial_y: 0,
+			initial_left: 0,
+			initial_top: 0
+		}
+	},
+	mounted()
+	{
+		let ajax = new Ajax();
+		ajax.get(`/api/users/${this.$store.user.username}/publications`)
+		.then(res =>
+		{
+			this.publications = res.data;
+		})
+		.catch(err =>
+		{
+			alert("Cannot fetch your publications > ", err.data);
+		});
+
+		if (navigator.mediaDevices)
+		{
+			navigator.mediaDevices.getUserMedia({ video: true })
+			.then(stream =>
+			{
+				this.$refs.video.srcObject = stream;
+				let width = this.$refs.video.offsetWidth;
+				let height = this.$refs.video.offsetWidth;
+				this.$refs.canvas.width = width;
+				this.$refs.canvas.height = height;
+			})
+			.catch((err) =>
+			{
+				console.error(err);
+			});
+		}
+		document.addEventListener('mousemove', (e) => this.moveSticker.apply(this, [e]))
+	},
+	unmounted()
+	{
+		const mediaStream = this.$refs.video.srcObject;
+		if (mediaStream)
+		{
+			const tracks = mediaStream.getTracks();
+			tracks[0].stop();
+		}
+	},
+	methods:
+	{
+		startMoveSticker(e, index)
+		{
+			this.moved_sticker_index = index;
+			this.is_moving = true
+			this.initial_x = e.clientX;
+			this.initial_y = e.clientY;
+			this.initial_left = parseInt(e.currentTarget.style.left.replace('px', '')) || 0;
+			this.initial_top = parseInt(e.currentTarget.style.top.replace('px', '')) || 0;
+		},
+
+		moveSticker(e)
+		{
+			if (this.is_moving && this.mode != 'publish')
+			{
+				let offset =
+				{
+					x: this.initial_left + e.clientX - this.initial_x,
+					y: this.initial_top + e.clientY - this.initial_y
+				};
+				// this.moved_sticker.elem.style.top = offset.y + 'px' old
+				// this.moved_sticker.elem.style.left = offset.x + 'px';   old
+
+				// this.moved_sticker.sticker.top = offset.y;
+				// this.moved_sticker.sticker.left = offset.x;
+
+				this.selected_stickers[this.moved_sticker_index].y = offset.y;
+				this.selected_stickers[this.moved_sticker_index].x = offset.x;
+			}
+		},
+
+		stopMove(e)
+		{
+			this.is_moving = false;
+			//this.moved_sticker.sticker.x = parseInt(this.moved_sticker.elem.style.left.replace('px', ''));
+			//this.moved_sticker.sticker.y = parseInt(this.moved_sticker.elem.style.top.replace('px', ''));
+			this.moved_sticker = null;
+		},
+
+		addSelectedSticker(sticker_src)
+		{
+			this.selected_stickers.push({
+				x: 0,
+				y: 0,
+				img: sticker_src
+			});
+		},
+
+		removeSelectedSticker(index)
+		{
+			this.selected_stickers.splice(index, 1);
+		},
+
+		takepicture()
+		{
+			let width = this.$refs.video.offsetWidth;
+			let height = this.$refs.video.offsetWidth;
+			this.$refs.canvas.width = width;
+			this.$refs.canvas.height = height;
+			this.$refs.canvas.getContext('2d').drawImage(this.$refs.video, 0, 0, width, height);
+			var data = this.$refs.canvas.toDataURL('image/png');
+			this.$refs.render_img.setAttribute('src', data);
+			this.image_selected = true;
+		},
+
+		handleUpload(e)
+		{
+			if (this.$refs.upload_input.files.length > 0)
+			{
+				let file = this.$refs.upload_input.files[0];
+				this.$refs.render_img.setAttribute('src', URL.createObjectURL(file));
+				this.image_selected = true;
+			}
+		},
+
+		publish()
+		{
+			fetch(this.$refs.render_img.src)
+			.then(res => res.blob())
+			.then(webcam_blob =>
+			{
+				const webcam_image = new File([webcam_blob], "capture.png",
+				{
+					type: 'image/png'
+				});
+
+				let ajax = new Ajax();
+				ajax.post(`/api/users/${this.$store.user.username}/publications`, {
+					webcam_image: webcam_image,
+					stickers: JSON.stringify(this.selected_stickers)
+				})
+				.then(res =>
+				{
+					this.publications.unshift(res.data);
+					alert("publication successfully created !");
+				})
+				.catch(err =>
+				{
+					alert("Error:", err.data);
+				});
+			})
+		},
+
+		clear()
+		{
+			this.image_selected = false;
+			this.selected_stickers = [];
+		}
+	}
+})
+
+</script>
+
+<template id="Builder">
+	<div class="builder">
+		<section class="main_section">
+			<div class="video_container" ref="video_container">
+				<video ref="video" autoplay></video>
+				<canvas ref="canvas"></canvas>
+				<img class="render_img" ref="render_img" yass-show="this.image_selected"/>
+				<div class="stickers_list">
+					<div class="sticker" yass-for="sticker in this.stickers" @click="this.addSelectedSticker(sticker)">
+						<img :src="sticker"/>
+					</div>
+				</div>
+				<div class="buttons_container">
+					<label class="upload_photo_button" @change="this.handleUpload($event)">
+						<input type="file" ref="upload_input" hidden/>
+						<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 228.407 228.407" style="enable-background:new 0 0 228.407 228.407;" xml:space="preserve"> <path fill="currentColor" d="M184.833,61.205c-10.192-29.553-38.173-49.75-69.857-49.75c-26.002,0-49.832,13.534-63.203,35.605 C22.846,49.318,0,73.577,0,103.072c0,30.98,25.205,56.186,56.241,56.186h50.451l-0.002,57.693h15l0.002-57.693h57.526 c27.122,0,49.188-22.065,49.188-49.187C228.407,84.857,209.337,64.014,184.833,61.205z M179.219,144.258h-57.526l0.001-40.795 l19.548,19.548l10.607-10.607l-37.654-37.652l-37.677,37.676l10.606,10.607l19.57-19.569l-0.002,40.793H56.185 c-22.71,0-41.185-18.476-41.185-41.186c0-22.645,18.372-41.08,40.995-41.184l4.762,0.002l2.111-3.996 c10.245-19.393,30.212-31.439,52.108-31.439c26.727,0,50.147,18.027,56.953,43.84l1.512,5.588h5.779 c18.851,0,34.188,15.337,34.188,34.188S198.07,144.258,179.219,144.258z"/> </svg>
+					</label>
+					<div class="take_photo_button" @click="this.takepicture()">
+						<svg viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" transform="translate(2 4)"><path d="m.5 10.5v-6c0-1.1045695.8954305-2 2-2h2l2.07861328-2h3.92016602l1.9194336 2h2.0817871c1.1045695 0 2 .8954305 2 2v6c0 1.1045695-.8954305 2-2 2h-12c-1.1045695 0-2-.8954305-2-2z"/><path d="m11.5 7.5c0-1.65685425-1.3431458-3-3-3-1.65685425 0-3 1.34314575-3 3s1.34314575 3 3 3c1.6568542 0 3-1.34314575 3-3z"/></g></svg>
+					</div>
+					<div class="publish_button" @click="this.publish($event)" yass-if="this.image_selected">
+						<svg aria-label="Partager la publication" class="_8-yf5 " height="24" role="img" viewBox="0 0 48 48" width="24"><path fill="currentColor" d="M47.8 3.8c-.3-.5-.8-.8-1.3-.8h-45C.9 3.1.3 3.5.1 4S0 5.2.4 5.7l15.9 15.6 5.5 22.6c.1.6.6 1 1.2 1.1h.2c.5 0 1-.3 1.3-.7l23.2-39c.4-.4.4-1 .1-1.5zM5.2 6.1h35.5L18 18.7 5.2 6.1zm18.7 33.6l-4.4-18.4L42.4 8.6 23.9 39.7z"></path></svg>
+					</div>
+					<div class="cancel_button" @click="this.clear()" yass-if="this.image_selected">
+						<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 371.23 371.23" style="enable-background:new 0 0 371.23 371.23;" xml:space="preserve"> <polygon fill="currentColor" points="371.23,21.213 350.018,0 185.615,164.402 21.213,0 0,21.213 164.402,185.615 0,350.018 21.213,371.23 185.615,206.828 350.018,371.23 371.23,350.018 206.828,185.615 "/> </svg>
+					</div>
+				</div>
+
+				<div class="selected_sticker" yass-for="selected_sticker in this.selected_stickers" @mouseup="this.stopMove($event, for_index)" @mousedown="this.startMoveSticker($event, for_index)" :style="{top: selected_sticker.y + 'px', left: selected_sticker.x + 'px'}">
+					<div class="remove_sticker_button" @click="this.removeSelectedSticker(for_index)">
+						<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 371.23 371.23" style="enable-background:new 0 0 371.23 371.23;" xml:space="preserve"> <polygon fill="currentColor" points="371.23,21.213 350.018,0 185.615,164.402 21.213,0 0,21.213 164.402,185.615 0,350.018 21.213,371.23 185.615,206.828 350.018,371.23 371.23,350.018 206.828,185.615 "/> </svg>
+					</div>
+					<img ref="selected_sticker_img" :src="selected_sticker.img"/>
+				</div>
+			</div>
+		</section>
+		<section class="old_photos_section">
+			<div class="publication_overview" yass-for="publication in this.publications">
+				<img :src="publication.path"/>
+			</div>
+		</section>
+	</div>
+</template>
+
+
+<style>
+
+.builder
+{
+	display: flex;
+	width: 100%;
+	height: calc(100vh - 3.5rem);
+}
+
+.builder *
+{
+	-webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.builder .main_section
+{
+	width: 70%;
+	height: 100%;
+	border-right: solid 1px;
+}
+
+.builder .old_photos_section
+{
+	display: flex;
+	flex-direction: column;
+	width: 30%;
+}
+
+.builder .video_container
+{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.builder video
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.builder canvas
+{
+	display: none;
+	width: 100%;
+	height: 100%;
+}
+
+.builder .stickers_list
+{
+	display: flex;
+	justify-content: center;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	z-index: 2;
+	width: 100%;
+	overflow-x: auto;
+}
+
+.builder .buttons_container
+{
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	transform: translateY(-50%);
+	z-index: 3;
+	width: fit-content;
+	overflow-x: auto;
+}
+
+.sticker
+{
+	width: 5rem;
+	cursor: pointer;
+	margin: 0.25rem 0.5rem;
+	/* border: solid 1px rgba(150, 150, 150, 0.25); */
+}
+
+.sticker img
+{
+	width: 100%;
+	height: 100%;
+}
+
+.selected_sticker
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
+}
+
+.selected_sticker:after
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	content: '';
+	width: 100%;
+	height: 100%;
+}
+
+.builder .buttons_container > *
+{
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 3.5rem;
+	height: 3.5rem;
+	border-radius: 100%;
+	cursor: pointer;
+	padding: 0.75rem;
+	border: solid 1px white;
+	color: rgb(255, 0, 209);;
+	background-color: white;
+	margin: 0.25rem 0.25rem;
+	transition: all 0.25s;
+}
+
+.builder .buttons_container > *:hover
+{
+	background-color: rgb(255, 0, 209);
+	border-color: rgb(255, 0, 209);
+	color: white;
+}
+
+.builder .buttons_container > * svg
+{
+	width: 2.5rem;
+}
+
+svg
+{
+	width: 100%;
+}
+
+.remove_sticker_button
+{
+	position: absolute;
+	transform: translate(-50%, -50%);
+	width: 1.25rem;
+	padding: 0.25rem;
+	color: white;
+	cursor: pointer;
+}
+
+.render_img
+{
+	position: relative;
+	z-index: 1;
+}
+
+.old_photos_section
+{
+	overflow: auto;
+}
+
+.publication_overview
+{
+	margin: 0.5rem;
+}
+
+.cancel_button svg
+{
+	padding: 0.375rem;
+}
+
+@media screen and (max-width: 500px)
+{
+	.builder
+	{
+		flex-direction: column;
+		height: fit-content;
+	}
+
+	.builder .main_section
+	{
+		width: 100%;
+		height: fit-content;
+	}
+
+	.builder .old_photos_section
+	{
+		width: 100%;
+	}
+
+	.builder .video_container
+	{
+		height: 100vh;
+	}
+
+	.old_photos_section
+	{
+		flex-direction: row;
+		overflow-x: auto;
+		width: 100%;
+	}
+}
+
+</style>

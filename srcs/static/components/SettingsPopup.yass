@@ -1,0 +1,267 @@
+<script>
+
+function validateEmail(email)
+{
+	return email.toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+}
+
+registerComponent({
+	name: "SettingsPopup",
+	methods:
+	{
+		setInputActive(e)
+		{
+			let input = e.target;
+			if (input.value != "")
+				input.classList.add('active')
+			else
+				input.classList.remove('active');
+		},
+		sendPasswordRequest()
+		{
+			let username = this.$store.user.username;
+			let ajax = new Ajax();
+			ajax.post('/api/account/send_restore_request', {username: username})
+			.then(res =>
+			{
+				alert(res.data);
+				let ajax = new Ajax();
+				ajax.post('/api/account/logout', {});
+				this.$store.user.is_logged_in = false;
+				this.$router.push('/');
+				this.$emit('close');
+			})
+			.catch(err =>
+			{
+				console.error(err.data);
+			});
+		},
+		save(e)
+		{
+			e.preventDefault();
+
+			let payload = {};
+			let url = `/api/users/${this.$store.user.id}`;
+			let username = this.$refs.username_input.value;
+			let email = this.$refs.email_input.value;
+			let mail_enabled = this.$refs.enable_mail_input.checked;
+			payload = {username, email, mail_enabled};
+			if (username.length == 0 || !validateEmail(email))
+				throw new Error('Please fill the form correctly.');
+
+			let ajax = new Ajax();
+			ajax.put(url, payload)
+			.then(res =>
+			{
+				alert("Profile successfully updated !");
+				this.$store.user.username = res.data.username;
+				this.$store.user.email = res.data.email;
+				this.$store.user.mail_enabled = res.data.mail_enabled
+			})
+			.catch(err =>
+			{
+				alert(err.data);
+			})
+		},
+
+		logout()
+		{
+			let ajax = new Ajax();
+			ajax.post('/api/account/logout', {});
+			this.$store.user.is_logged_in = false;
+			this.$router.push('/');
+		}
+	}
+})
+
+</script>
+
+<template id="SettingsPopup">
+	<div class="settings_popup">
+		<h2>Settings</h2>
+		<form @submit="this.save($event)">
+			<div class="account_info" yass-if="!this.security_editor">
+				<div class="switch_field">
+					<p>Mail enabled</p>
+					<label class="switch">
+						<input ref="enable_mail_input" type="checkbox" checked>
+						<span class="slider"></span>
+					</label>
+				</div>
+				<div class="field">
+					<input ref="username_input" :value="this.$store.user.username" @input="this.setInputActive($event)" type="text" id="username" :class="{active: this.$refs.username_input.value != ''}" autocomplete/>
+					<label for="username">Username</label>
+				</div>
+				<div class="field">
+					<input :value="this.$store.user.email" @input="this.setInputActive($event)" ref="email_input" type="text" id="email" :class="{active: this.$refs.email_input.value != ''}" autocomplete/>
+					<label for="email">Email</label>
+				</div>
+				<p class="change_mode_button" @click="this.sendPasswordRequest()">Edit password</p>
+			</div>
+			<input type="submit" class="save_button" value="Save"/>
+		</form>
+	</div>
+</template>
+
+<style>
+
+.settings_popup
+{
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 30rem;
+	max-width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+	padding: 1rem;
+	background: white;
+	border: solid 1px black;
+	z-index: 1;
+}
+
+.settings_popup h2
+{
+	font-weight: normal;
+	font-size: 2rem;
+	width: 100%;
+	text-align: center;
+	margin-top: 0;
+}
+
+.settings_popup .field
+{
+	position: relative;
+	margin: 1rem 0;
+	padding: 0.5rem 0;
+	width: 100%;
+}
+
+.field input
+{
+	padding: 0.25rem 0.5rem;
+	font-size: 1rem;
+	outline: none;
+	border: none;
+	border-bottom: solid 1px #00000033;
+	transition: all 0.25s;
+	width: 100%;
+}
+
+.field input:focus
+{
+	border-bottom: solid 1px ;
+}
+
+.field label
+{
+	position: absolute;
+	top: 0.75rem;
+	left: 0.5rem;
+	font-size: 1rem;
+	color: #454545;
+	cursor: text;
+	width: 100%;
+	transition: all 0.25s;
+}
+
+.field input:focus ~ label,
+.field input.active ~ label
+{
+	top: -0.5rem;
+}
+
+.save_button
+{
+	display: block;
+	padding: 0.5rem 1rem;
+	background: transparent;
+	border: solid 1px black;
+	margin: 0 auto;
+	font-size: 1rem;
+	cursor: pointer;
+}
+
+.switch_field
+{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.switch_field p
+{
+	margin: 0.5rem;
+}
+
+.switch
+{
+  position: relative;
+  display: inline-block;
+  width: 2.75rem;
+  height: 1.5rem;
+}
+
+.switch input
+{ 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider
+{
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 2rem;
+  -webkit-transition: 0.25s;
+  transition: 0.25s;
+}
+
+.slider:before
+{
+	position: absolute;
+	content: "";
+	height: 1.125rem;
+	width: 1.125rem;
+	left: 0.125rem;
+	top: 50%;
+	transform: translateY(-50%);
+	background-color: white;
+	border-radius: 50%;
+	-webkit-transition: 0.25s;
+	transition: 0.25s;
+}
+
+input:checked + .slider
+{
+  background-color: #2196F3;
+}
+
+input:focus + .slider
+{
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before
+{
+  -webkit-transform: translateX(1.25rem) translateY(-50%);
+  -ms-transform: translateX(1.25rem) translateY(-50%);
+  transform: translateX(1.25rem) translateY(-50%);
+}
+
+.change_mode_button
+{
+	cursor: pointer;
+}
+
+</style>

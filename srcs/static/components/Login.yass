@@ -1,0 +1,146 @@
+<script>
+
+registerComponent({
+	name: 'Login',
+	methods:
+	{
+		setInputActive(e)
+		{
+			let input = e.target;
+			if (input.value != "")
+				input.classList.add('active')
+			else
+				input.classList.remove('active');
+		},
+		sendForm(e)
+		{
+			e.preventDefault();
+			let username = this.$refs.username_input.value;
+			let password = this.$refs.password_input.value;
+
+			if (password.length > 0 && username.length > 0)
+			{
+				let ajax = new Ajax();
+				ajax.post('/api/account/login', {username: username, password: password})
+				.then(res =>
+				{
+					this.$store.user.is_logged_in = true;
+					this.$store.user.id = res.data.id;
+					this.$store.user.username = res.data.username;
+					this.$store.user.email = res.data.email;
+					this.$router.push('/');
+				})
+				.catch(err =>
+				{
+					alert(err.data);
+				});
+			}
+			else
+				alert("Please fill form correctly. ah");
+		}
+	}
+})
+	
+</script>
+
+<template id="Login">
+	<div class="login">
+		<h1>Login</h1>
+		<form id="login_form" @submit="this.sendForm($event)">
+			<div class="field">
+				<input @input="this.setInputActive($event)" ref="username_input" type="text" id="username" autocomplete/>
+				<label for="username">Username</label>
+			</div>
+			<div class="field">
+				<input @input="this.setInputActive($event)" ref="password_input" type="password" id="password" autocomplete/>
+				<label for="password">Password</label>
+			</div>
+			<a router-link href="/register">Don't have an account ? Login here</a>
+			<a router-link href="/forgotten_password">Forgotten password ?</a>
+			<input type="submit" class="button" id="login_button" value="Login">
+		</form>
+	</div>
+</template>
+
+<style>
+
+.login
+{
+	margin: 0 auto;
+	width: 15rem;
+	max-width: 100%;
+}
+
+.login h1
+{
+	font-weight: normal;
+	width: 100%;
+	text-align: center;
+}
+
+.login .field
+{
+	position: relative;
+	margin: 1rem 0;
+	padding: 0.5rem 0;
+	width: 100%;
+}
+
+.login input
+{
+	padding: 0.25rem 0.5rem;
+	font-size: 1rem;
+	outline: none;
+	border: none;
+	border-bottom: solid 1px #00000033;
+	transition: all 0.25s;
+	width: 100%;
+}
+
+.login input:focus
+{
+	border-bottom: solid 1px ;
+}
+
+.login label
+{
+	position: absolute;
+	top: 0.75rem;
+	left: 0.5rem;
+	font-size: 1rem;
+	color: #454545;
+	cursor: text;
+	width: 100%;
+	transition: all 0.25s;
+}
+
+.login input:focus ~ label,
+.login input.active ~ label
+{
+	top: -0.5rem;
+}
+
+.login #login_button
+{
+	display: block;
+	padding: 0.5rem 0.5rem;
+	width: 10rem;
+	margin: 0.5rem auto;
+	text-align: center;
+	cursor: pointer;
+	border: solid 1px black;
+	transition: all 0.25s;
+	background-color: white;
+}
+
+.login a
+{
+	display: block;
+}
+
+.field input
+{
+	background: transparent;
+}
+
+</style>

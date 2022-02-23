@@ -1,0 +1,53 @@
+<script>
+
+registerComponent({
+	name: "PublicationView",
+	data()
+	{
+		return {
+			publication: null,
+		}
+	},
+	mounted()
+	{
+		this.load();
+	},
+	methods:
+	{
+		load()
+		{
+			let id = this.$router.current_route.params.id;
+			let ajax = new Ajax();
+			ajax.get(`/api/publications/${id}`)
+			.then(res =>
+			{
+				this.publication = res.data;
+			})
+			.catch(err =>
+			{
+				alert(err.data);
+			})
+		}
+	}
+})
+
+</script>
+
+<template id="PublicationView">
+	<div class="publication_view">
+		<Publication :publication="this.publication" @remove="this.load()" yass-if="this.publication"></Publication>
+	</div>
+</template>
+
+<style>
+	
+.publication_view
+{
+	width: fit-content;
+	max-width: 100%;
+	display: flex;
+	flex-direction: column;
+	margin: 0 auto;
+}
+
+</style>

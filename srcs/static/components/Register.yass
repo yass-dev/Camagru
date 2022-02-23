@@ -1,0 +1,149 @@
+<script>
+
+function validateEmail(email)
+{
+	return email.toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+}
+
+function validatePassword(password)
+{
+	console.log(password);
+	return (password.length > 4 && password.toLowerCase() != password);
+}
+
+registerComponent({
+	name: 'Register',
+	methods:
+	{
+		setInputActive(e)
+		{
+			let input = e.target;
+			if (input.value != "")
+				input.classList.add('active')
+			else
+				input.classList.remove('active');
+		},
+		sendForm(e)
+		{
+			e.preventDefault();
+			let username = this.$refs.username_input.value;
+			let email = this.$refs.email_input.value;
+			let password = this.$refs.password_input.value;
+
+			if (validateEmail(email) && username.length > 0 && validatePassword(password))
+			{
+				let ajax = new Ajax();
+				ajax.post('/api/account/register', {username: username, email: email, password: password}).then(res =>
+				{
+					alert("Successfully registered")
+				})
+				.catch(err =>
+				{
+					alert(err.data);
+				})
+			}
+			else
+				alert('please complete the form correctly. Password must contains at least 5 characters and one uppercase letter.');
+		}
+	}
+})
+	
+</script>
+
+<template id="Register">
+	<div class="register">
+		<h1>Register</h1>
+		<form id="register_form" @submit="this.sendForm($event)">
+			<div class="field">
+				<input @input="this.setInputActive($event)" ref="username_input" type="text" id="username" autocomplete/>
+				<label for="username">Username</label>
+			</div>
+			<div class="field">
+				<input @input="this.setInputActive($event)" ref="email_input" type="mail" id="email" autocomplete/>
+				<label for="email">Email</label>
+			</div>
+			<div class="field">
+				<input @input="this.setInputActive($event)" ref="password_input" type="password" id="password" autocomplete/>
+				<label for="password">Password</label>
+			</div>
+			<a router-link href="/login">Already have an account ? Login here</a>
+			<input type="submit" class="button" id="register_button" value="Register">
+		</form>
+	</div>
+</template>
+
+<style>
+
+.register
+{
+	margin: 0 auto;
+	width: 15rem;
+	max-width: 100%;
+}
+
+.register h1
+{
+	font-weight: normal;
+	width: 100%;
+	text-align: center;
+}
+
+.register .field
+{
+	position: relative;
+	margin: 1rem 0;
+	padding: 0.5rem 0;
+	width: 100%;
+}
+
+.register input
+{
+	padding: 0.25rem 0.5rem;
+	font-size: 1rem;
+	outline: none;
+	border: none;
+	border-bottom: solid 1px #00000033;
+	transition: all 0.25s;
+	width: 100%;
+}
+
+.register input:focus
+{
+	border-bottom: solid 1px ;
+}
+
+.register label
+{
+	position: absolute;
+	top: 0.75rem;
+	left: 0.5rem;
+	font-size: 1rem;
+	color: #454545;
+	cursor: text;
+	width: 100%;
+	transition: all 0.25s;
+}
+
+.register input:focus ~ label,
+.register input.active ~ label
+{
+	top: -0.5rem;
+}
+
+.register #register_button
+{
+	display: block;
+	padding: 0.5rem 0.5rem;
+	width: 10rem;
+	margin: 0.5rem auto;
+	text-align: center;
+	cursor: pointer;
+	border: solid 1px black;
+	transition: all 0.25s;
+	background-color: white;
+}
+
+</style>
