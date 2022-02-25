@@ -31,9 +31,11 @@ registerComponent({
 			});
 		},
 
-		removePublication(index)
+		removePublication(id)
 		{
-			this.publications.splice(index, 1);
+			this.publications = [];
+			for (let i = 1; i <= this.page; i++)
+				this.load(i);
 		}
 	}
 })

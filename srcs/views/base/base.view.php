@@ -9,6 +9,7 @@
 		<script src="/static/js/yass.js"></script>
 		<script src="/static/js/yass-router.js"></script>
 		<script src="/static/js/yass-store.js"></script>
+		<link rel="icon" href="/favicon.ico"/>
 		<title>Camagru | <?= isset($page_name) ? $page_name : "" ?></title>
 	</head>
 	<body>

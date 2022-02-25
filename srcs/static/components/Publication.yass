@@ -24,6 +24,10 @@ registerComponent({
 					this.updatePublication(publication);
 					this.liked = false
 				})
+				.catch(err =>
+				{
+					console.error(err);
+				});
 			else
 				ajax.post(`/publications/${this.publication.id}/likes`, {})
 				.then(res =>
@@ -32,6 +36,7 @@ registerComponent({
 					this.updatePublication(publication);
 					this.liked = true;
 				})
+				.catch(console.error)
 		},
 
 		removePublication()

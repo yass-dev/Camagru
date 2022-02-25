@@ -4,11 +4,11 @@ services:
     apache:
         build:
             context: ./srcs
-        container_name: 'Apache'
+        container_name: Apache
         depends_on:
             - database
-        volumes:
-            - ./srcs:/var/www/html
+        # volumes:
+            # - ./srcs:/var/www/html
         ports:
             - 8080:80
 
@@ -16,10 +16,10 @@ services:
         image: mysql
         container_name: database
         environment:
-            MYSQL_ROOT_PASSWORD: pass
+            MYSQL_ROOT_PASSWORD: password
             MYSQL_DATABASE: camagru
-        volumes:
-            - ./db_data:/var/lib/mysql
+        # volumes:
+            # - ./db_data:/var/lib/mysql
 
     phpmyadmin:
         container_name: phpmyadmin
@@ -27,7 +27,7 @@ services:
         environment:
             PMA_HOST: database
             PMA_USER: root
-            PMA_PASSWORD: pass
+            PMA_PASSWORD: password
         ports:
             - 8000:80
 

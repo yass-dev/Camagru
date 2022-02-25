@@ -16,7 +16,7 @@ require_once('controllers/publication.controller.php');
 function initORM()
 {
 	$orm = new ORM();
-	$orm->connect('database', 'camagru', 'root', 'pass');
+	$orm->connect('database', 'camagru', 'root', 'password');
 	$orm->registerEntity(new User);
 	$orm->registerEntity(new Publication);
 	$orm->registerEntity(new LikedPublication);

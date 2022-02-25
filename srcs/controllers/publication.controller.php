@@ -36,7 +36,7 @@ class PublicationController
 		$stickers = json_decode($_POST['stickers']);
 
 		if ($_FILES['webcam_image']['error'])
-			throw new BadRequestException("Bad base image.");
+			throw new BadRequestException("Bad base image." . $_FILES['webcam_image']['error']);
 
 		$tmp_webcam = $_FILES['webcam_image']['tmp_name'];
 		$webcam_img = imagecreatefromfile($tmp_webcam);
@@ -71,7 +71,7 @@ class PublicationController
 				imagesavealpha($sticker_img, true);
 			}
 
-			imagecopy($webcam_img, $sticker_img, $sticker_x, $sticker_y, 0, 0, $sticker_width, $sticker_height); //have to play with these numbers for it to work for you, etc.
+			imagecopy($webcam_img, $sticker_img, $sticker_x, $sticker_y, 0, 0, $sticker_width, $sticker_height);
 			imagedestroy($sticker_img);
 		}
 

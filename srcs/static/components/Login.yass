@@ -55,7 +55,7 @@ registerComponent({
 				<input @input="this.setInputActive($event)" ref="password_input" type="password" id="password" autocomplete/>
 				<label for="password">Password</label>
 			</div>
-			<a router-link href="/register">Don't have an account ? Login here</a>
+			<a router-link href="/register">Don't have an account ? Register here</a>
 			<a router-link href="/forgotten_password">Forgotten password ?</a>
 			<input type="submit" class="button" id="login_button" value="Login">
 		</form>
