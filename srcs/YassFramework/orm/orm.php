@@ -66,6 +66,30 @@ class ORM
 		}
 	}
 
+	public function connectURL($url)
+	{
+		$type = explode('://', $url)[0];
+		$url = substr($url, strpos($url, '://') + 3);
+		$username = explode(':', $url)[0];
+		$url = substr($url, strpos($url, ':') + 1);
+		$password = explode('@', $url)[0];
+		$url = substr($url, strpos($url, '@') + 1);
+		$host = explode(':', $url)[0];
+		$url = substr($url, strpos($url, ':') + 1);
+		$port = explode('/', $url)[0];
+		$dbname = explode('/', $url)[1];
+
+		try
+		{
+			$this->db = new PDO("$type:host=$host;dbname=$dbname;charset=utf8;port=$port", "$username", "$password");
+			echo "success";
+		}
+		catch (Exception $e)
+		{
+			die($e->getMessage());
+		}
+	}
+
 	public function registerRepository($entity_class, $repository_class)
 	{
 		$this->repositories[$entity_class] = $repository_class;
