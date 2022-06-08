@@ -198,6 +198,9 @@ class PublicationController
 		$publication = $repo->findOne([], ['id' => $publication_id]);
 		if ($publication == NULL)
 			throw new NotFoundException("Publication $publication_id not found.");
+
+		if ($publication->user_id != Session::get('user_id'))
+			throw new ForbiddenException("You cannot remove this publication.");
 		
 		$repo->removePublication($publication);
 		echo "Publication deleted sucessfully.";
